@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hostel Warden Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+    <link rel="stylesheet" href="/ward_dash/ward_dash.css">
+</head>
+<body>
+
+<div id="toasts"></div>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen" id="loginScreen">
+    <div class="login-card">
+        <div class="login-icon"><i class="ti ti-building"></i></div>
+        <h2>Hostel Warden Login</h2>
+        <p class="login-sub">Select your hostel to view student library access</p>
+        <div class="hostel-grid" id="hostelGrid">
+            <button class="hostel-btn" onclick="login('SPS')">
+                <div class="hcode">SPS</div>
+                <div class="hname">Sandipani Sadan</div>
+            </button>
+            <button class="hostel-btn" onclick="login('RLV')">
+                <div class="hcode">RLV</div>
+                <div class="hname">Rajalakshmi Vihar</div>
+            </button>
+            <button class="hostel-btn" onclick="login('PV')">
+                <div class="hcode">PV</div>
+                <div class="hname">Paramandha Vihar</div>
+            </button>
+            <button class="hostel-btn" onclick="login('KMD')">
+                <div class="hcode">KMD</div>
+                <div class="hname">Kamadhenu</div>
+            </button>
+            <button class="hostel-btn" onclick="login('V')">
+                <div class="hcode">V</div>
+                <div class="hname">Vashishta</div>
+            </button>
+        </div>
+        <div class="login-footer">
+            <p><i class="ti ti-lock"></i> Only authorized wardens can access student data</p>
+        </div>
+    </div>
+</div>
+
+<!-- MAIN DASHBOARD -->
+<div class="page" id="mainPage">
+    <div class="topbar">
+        <div>
+            <div class="topbar-name" id="topbarName">—</div>
+            <div class="topbar-sub" id="topbarSub">—</div>
+        </div>
+        <div class="topbar-right">
+            <div class="live-pill">
+                <div class="live-dot"></div>
+                <span>Auto-refreshing</span>
+            </div>
+            <button class="btn btn-ghost-inv btn-sm" onclick="logout()">
+                <i class="ti ti-logout" aria-hidden="true"></i> Sign out
+            </button>
+        </div>
+    </div>
+
+    <div class="content">
+        <div class="warden-bar">
+            <div class="w-avatar" id="wAvatar">--</div>
+            <div class="w-info">
+                <div class="w-name" id="wName">—</div>
+                <div class="w-hostel" id="wHostel">—</div>
+            </div>
+            <div class="w-count">
+                <div class="w-count-num" id="wCount">0</div>
+                <div class="w-count-lbl" id="wCountLbl">students in library now</div>
+            </div>
+        </div>
+
+        <div class="rc-banner" id="rcBanner" style="display:none" role="alert">
+            <i class="ti ti-clock-exclamation" aria-hidden="true"></i>
+            <span>
+                <strong>Roll call time.</strong>
+                Students listed below are confirmed at the library — mark them as
+                <strong>AT LIBRARY</strong> in the hostel biometric system, not as LATE.
+                They will return after 8:00 PM.
+            </span>
+        </div>
+
+        <div class="section">
+            <div class="sec-head">
+                <div class="sec-label">
+                    <i class="ti ti-door-enter" aria-hidden="true"></i>
+                    Currently in library
+                    <span class="cnt-badge" id="activeBadge">0</span>
+                </div>
+                <div class="sec-meta" id="activeUpdated">—</div>
+            </div>
+            <div class="tbl-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Room</th>
+                            <th>Entered at</th>
+                            <th>Duration</th>
+                            <th>Roll call status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="activeSessionsBody">
+                        <tr><td colspan="5" class="empty">No students from your hostel are currently in the library</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="sec-head">
+                <div class="sec-label">
+                    <i class="ti ti-home-check" aria-hidden="true"></i>
+                    Returned today
+                    <span class="cnt-badge zero" id="returnedBadge">0</span>
+                </div>
+                <div class="sec-meta">Students who completed their library session</div>
+            </div>
+            <div class="tbl-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Room</th>
+                            <th>Library in</th>
+                            <th>Library out</th>
+                            <th>Duration</th>
+                            <th>Hostel return</th>
+                            <th>Status</th>  <!-- ✅ Changed from "ROLL CALL" to "STATUS" -->
+                        </tr>
+                    </thead>
+                    <tbody id="exitLogsBody">
+                        <tr><td colspan="7" class="empty">No students have returned yet today</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/ward_dash/ward_dash.js"></script>
+</body>
+</html>

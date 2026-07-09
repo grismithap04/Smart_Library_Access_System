@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Library Smart Access System — Librarian dashboard">
+    <title>Librarian — Library Smart Access</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+    <link rel="stylesheet" href="/lib_dash/lib_dash.css">
+</head>
+<body>
+
+<div id="toasts"></div>
+
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<div class="shell">
+    <!-- SIDEBAR -->
+    <nav class="sidebar" id="sidebar" aria-label="Main navigation">
+        <div class="sb-brand">
+            <div class="sb-brand-name"><i class="ti ti-building-library" aria-hidden="true"></i>&ensp;Library Access</div>
+            <div class="sb-brand-role">Librarian dashboard</div>
+        </div>
+        <div class="sb-nav">
+            <button class="sb-item active" onclick="scrollToTop(); closeSidebar();">
+                <i class="ti ti-layout-dashboard" aria-hidden="true"></i> Live view
+            </button>
+            <button class="sb-item" onclick="showManualModal(); closeSidebar();">
+                <i class="ti ti-edit" aria-hidden="true"></i> Manual entry
+            </button>
+            <button class="sb-item" onclick="showEnrollModal(); closeSidebar();">
+                <i class="ti ti-fingerprint" aria-hidden="true"></i> Register fingerprint
+            </button>
+            <button class="sb-item" onclick="exportCSV(); closeSidebar();">
+                <i class="ti ti-download" aria-hidden="true"></i> Export today's log
+            </button>
+        </div>
+        <div class="sb-foot">
+            <div class="live-pill">
+                <div class="live-dot"></div>
+                <span>Syncing every 15s</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <div class="main">
+        <!-- TOPBAR -->
+        <div class="topbar">
+            <div class="topbar-left">
+                <button class="hamburger" onclick="toggleSidebar()" aria-label="Toggle menu">
+                    <i class="ti ti-menu-2" aria-hidden="true"></i>
+                </button>
+                <div>
+                    <div class="topbar-title">Live library sessions</div>
+                    <div class="topbar-date" id="topbarDate">—</div>
+                </div>
+            </div>
+            <div class="topbar-right">
+                <!-- Entry Cutoff Badge -->
+                <span class="cutoff-badge" id="cutoffBadge">
+                    <i class="ti ti-clock" aria-hidden="true"></i>
+                    <span id="cutoffText">Entry open until 6:10 PM</span>
+                </span>
+                
+                <!-- Auto-Exit Status Badge -->
+                <span class="cutoff-badge" id="autoExitBadge">
+                    <i class="ti ti-clock" aria-hidden="true"></i>
+                    <span id="autoExitText">⏰ Auto-exit at 8:10 PM</span>
+                </span>
+                
+                <!-- Refresh Button -->
+                <button class="btn btn-ghost btn-sm" onclick="refreshData()">
+                    <i class="ti ti-refresh" aria-hidden="true"></i> Refresh
+                </button>
+                
+                <!-- Force Auto-Exit Button -->
+                <button class="btn btn-red btn-sm" onclick="autoExit()">
+                    <i class="ti ti-door-exit" aria-hidden="true"></i> Force Exit All
+                </button>
+            </div>
+        </div>
+
+        <!-- CONTENT -->
+        <div class="content">
+            <!-- STATS -->
+            <div class="stat-row">
+                <div class="stat-pill primary">
+                    <div class="stat-icon" style="background:var(--green-bg);color:var(--green)">
+                        <i class="ti ti-users" aria-hidden="true"></i>
+                    </div>
+                    <div>
+                        <div class="stat-num primary" id="statIn">0</div>
+                        <div class="stat-lbl">In library now</div>
+                    </div>
+                </div>
+                <div class="stat-pill">
+                    <div class="stat-icon" style="background:var(--blue-bg);color:var(--blue)">
+                        <i class="ti ti-user-check" aria-hidden="true"></i>
+                    </div>
+                    <div>
+                        <div class="stat-num" id="statToday">0</div>
+                        <div class="stat-lbl">Entered today</div>
+                    </div>
+                </div>
+                <div class="stat-pill">
+                    <div class="stat-icon" style="background:var(--red-bg);color:var(--red)">
+                        <i class="ti ti-alert-triangle" aria-hidden="true"></i>
+                    </div>
+                    <div>
+                        <div class="stat-num" id="statAlerts">0</div>
+                        <div class="stat-lbl">Active alerts</div>
+                    </div>
+                </div>
+                <div class="stat-pill">
+                    <div class="stat-icon" style="background:var(--amber-bg);color:var(--amber)">
+                        <i class="ti ti-fingerprint" aria-hidden="true"></i>
+                    </div>
+                    <div>
+                        <div class="stat-num" id="statRegistered">0</div>
+                        <div class="stat-lbl">Registered students</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ALERT TRAY -->
+            <div class="alert-tray" id="alertTray" aria-live="polite"></div>
+
+            <!-- ACTIVE SESSIONS -->
+            <div class="section">
+                <div class="sec-head">
+                    <div class="sec-label">
+                        <i class="ti ti-door-enter" aria-hidden="true"></i>
+                        Students inside now
+                        <span class="cnt-badge" id="activeBadge">0</span>
+                    </div>
+                    <div class="sec-meta" id="lastUpdated">—</div>
+                </div>
+                <div class="tbl-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Reg no</th>
+                                <th>Entry</th>
+                                <th>Duration</th>
+                                <th>Status</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="activeBody">
+                            <tr><td colspan="6" class="empty">No students currently in library</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TODAY'S LOG -->
+            <div class="section">
+                <div class="sec-head">
+                    <div class="sec-label">
+                        <i class="ti ti-list" aria-hidden="true"></i>
+                        Today's log
+                        <span class="cnt-badge" id="logBadge">0</span>
+                    </div>
+                    <div class="sec-meta">All entries and exits for today</div>
+                </div>
+                <div class="tbl-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Reg no</th>
+                                <th>Entry</th>
+                                <th>Exit</th>
+                                <th>Duration</th>
+                                <th>Type</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logBody">
+                            <tr><td colspan="7" class="empty">No records for today</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ========== MODALS ========== -->
+
+<!-- MANUAL ENTRY MODAL -->
+<div class="modal-bg" id="manualModal" role="dialog" aria-modal="true" aria-labelledby="manualTitle">
+    <div class="modal">
+        <div class="modal-title" id="manualTitle">
+            <i class="ti ti-edit" aria-hidden="true"></i> Manual entry
+        </div>
+        <label for="m_reg">Register number</label>
+        <input type="text" id="m_reg" placeholder="e.g. 128015057" autocomplete="off">
+        <label for="m_type">Entry type</label>
+        <select id="m_type">
+            <option value="entry">Library entry (in)</option>
+            <option value="exit">Library exit (out)</option>
+        </select>
+        <label for="m_time">Date and time</label>
+        <input type="datetime-local" id="m_time">
+        <label for="m_reason">Reason for manual entry</label>
+        <input type="text" id="m_reason" placeholder="e.g. Sensor did not beep, student missed tap">
+        <div class="modal-foot">
+            <button class="btn btn-ghost" onclick="closeModal('manualModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="saveManual()">
+                <i class="ti ti-check" aria-hidden="true"></i> Save
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ENROLLMENT MODAL -->
+<div class="modal-bg" id="enrollModal" role="dialog" aria-modal="true" aria-labelledby="enrollTitle">
+    <div class="modal">
+        <div class="modal-title" id="enrollTitle">
+            <i class="ti ti-fingerprint" aria-hidden="true"></i> Register Fingerprint
+        </div>
+        <label for="e_reg">Register Number</label>
+        <input type="text" id="e_reg" placeholder="e.g. 128015057" autocomplete="off">
+        <div id="enrollStudentInfo" style="display:none; padding:10px; border-radius:8px; margin:10px 0;">
+            <div id="e_student_name" style="font-weight:600; color:var(--green);"></div>
+            <div id="e_student_details" style="font-size:12px;color:var(--ink-3);"></div>
+        </div>
+        <div class="info-note" id="enrollInstructions">
+            <i class="ti ti-info-circle" aria-hidden="true"></i>
+            Ask the student to place their finger on the sensor twice. The sensor will guide them through the process.
+        </div>
+        <div class="modal-foot">
+            <button class="btn btn-ghost" onclick="closeModal('enrollModal')">Cancel</button>
+            <button class="btn btn-primary" onclick="startEnrollment()">
+                <i class="ti ti-fingerprint" aria-hidden="true"></i> Start Enrollment
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- FORCE EXIT CONFIRM MODAL -->
+<div class="modal-bg" id="exitModal" role="dialog" aria-modal="true" aria-labelledby="exitTitle">
+    <div class="modal">
+        <div class="modal-title" id="exitTitle">
+            <i class="ti ti-door-exit" aria-hidden="true"></i> Confirm force exit
+        </div>
+        <p id="exitMsg" style="font-size:13px;color:var(--ink-2);line-height:1.6"></p>
+        <div class="modal-foot">
+            <button class="btn btn-ghost" onclick="closeModal('exitModal')">Cancel</button>
+            <button class="btn btn-red" onclick="confirmExit()">
+                <i class="ti ti-check" aria-hidden="true"></i> Confirm exit
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ========== SCRIPTS ========== -->
+<script>
+// ========== SIDEBAR TOGGLE ==========
+function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('sidebarOverlay').classList.toggle('active');
+}
+
+function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').classList.remove('active');
+}
+
+document.addEventListener('click', function(e) {
+    if (window.innerWidth <= 768) {
+        const sidebar = document.getElementById('sidebar');
+        const hamburger = document.querySelector('.hamburger');
+        if (!sidebar.contains(e.target) && !hamburger.contains(e.target)) {
+            closeSidebar();
+        }
+    }
+});
+</script>
+
+<script src="/lib_dash/lib_dash.js"></script>
+</body>
+</html>
