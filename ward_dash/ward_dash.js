@@ -83,8 +83,8 @@ function isRollCallTime() {
     var now = new Date();
     var h = now.getHours();
     var m = now.getMinutes();
-    // 7:30 PM – 8:30 PM (19:30 to 20:30)
-    return (h === 19 && m >= 30) || (h === 20 && m <= 30);
+    // 7:15 PM – 8:30 PM (19:15 to 20:30)
+    return (h === 19 && m >= 15) || (h === 20 && m <= 30);
 }
 
 // ========== API ==========
