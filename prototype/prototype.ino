@@ -9,9 +9,9 @@
 // ============================================
 // NETWORK CONFIG
 // ============================================
-const char* ssid     = "ACTFIBERNET";
-const char* password = "act12345";
-const char* baseUrl  = "http://192.168.0.142:5000";
+const char* ssid     = "OnePlus Nord 3 5G";
+const char* password = "offthemap";
+const char* baseUrl = "http://10.144.55.48:5000";
 // ============================================
 // PIN DEFINITIONS
 // ============================================
